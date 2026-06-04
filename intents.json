@@ -1,0 +1,172 @@
+{
+    "intents": [
+        {
+            "tag": "greeting",
+            "patterns": [
+                "hello",
+                "hi",
+                "hey",
+                "hy",
+                "is anyone there?",
+                "good day",
+                "morning",
+                "greetings",
+                "hi there"
+            ],
+            "responses": [
+                "Hi there! 👋 I'm your Cloud Computing Assistant. How can I help you today?"
+            ]
+        },
+        {
+            "tag": "goodbye",
+            "patterns": [
+                "bye",
+                "see you later",
+                "goodbye",
+                "quit",
+                "exit"
+            ],
+            "responses": [
+                "Thank you for engineering with me today. Have a stable and scalable day ahead!",
+                "Goodbye! If you need further cloud infrastructure support, I am always online."
+            ]
+        },
+        {
+            "tag": "cloud_services_questions",
+            "patterns": [
+                "What is cloud computing",
+                "definition of cloud computing",
+                "What are the benefits of cloud computing",
+                "advantages of cloud",
+                "What are the types of cloud computing",
+                "public private hybrid cloud",
+                "What is SaaS",
+                "What is PaaS",
+                "What is IaaS",
+                "software as a service platform as a service"
+            ],
+            "responses": [
+                "Cloud computing is the delivery of on-demand computing resources over the internet with flexible scaling and cost efficiency."
+            ]
+        },
+        {
+            "tag": "aws_questions",
+            "patterns": [
+                "What is AWS",
+                "Amazon Web Services",
+                "What is Amazon EC2",
+                "What is Amazon S3",
+                "What is AWS Lambda",
+                "What is Amazon RDS",
+                "What is AWS CloudWatch",
+                "monitoring EC2 S3 database setup"
+            ],
+            "responses": [
+                "Amazon Web Services (AWS) provides reliable, scalable, and secure cloud infrastructure tools like EC2, S3, and Lambda for global deployments."
+            ]
+        },
+        {
+            "tag": "azure_questions",
+            "patterns": [
+                "What is Microsoft Azure",
+                "What is Azure Virtual Machine",
+                "What is Azure Storage",
+                "What is Azure App Service",
+                "What is Azure Active Directory",
+                "azure IAM VM"
+            ],
+            "responses": [
+                "Microsoft Azure offers robust cloud services including scalable Virtual Machines, App Services, and integrated Active Directory management."
+            ]
+        },
+        {
+            "tag": "gcp_questions",
+            "patterns": [
+                "What is Google Cloud Platform",
+                "GCP",
+                "What is Google Compute Engine",
+                "What is Google Cloud Storage",
+                "What is Google Kubernetes Engine",
+                "GKE",
+                "What is BigQuery"
+            ],
+            "responses": [
+                "Google Cloud Platform (GCP) specializes in powerful data analytics, BigQuery data warehousing, and managed container orchestration via GKE."
+            ]
+        },
+        {
+            "tag": "security_questions",
+            "patterns": [
+                "What is cloud security",
+                "Why is cloud security important",
+                "What is Multi-Factor Authentication",
+                "MFA",
+                "What is encryption",
+                "What is a firewall",
+                "What is IAM"
+            ],
+            "responses": [
+                "Cloud security protects data through strategic firewalls, Multi-Factor Authentication (MFA), strict data encryption, and Identity & Access Management (IAM)."
+            ]
+        },
+        {
+            "tag": "deployment_questions",
+            "patterns": [
+                "What is deployment",
+                "What is cloud deployment",
+                "What is CI/CD",
+                "What is Docker",
+                "What is Kubernetes",
+                "How can I deploy a Flask application"
+            ],
+            "responses": [
+                "Deployment is automated using CI/CD pipelines, container systems like Docker, and orchestrators like Kubernetes to make apps globally available."
+            ]
+        },
+        {
+            "tag": "storage_questions",
+            "patterns": [
+                "What is cloud storage",
+                "What are the advantages of cloud storage",
+                "What is object storage",
+                "What is block storage",
+                "What is backup storage"
+            ],
+            "responses": [
+                "Cloud storage systems vary between unstructured Object Storage (S3/GCS) and high-performance Block Storage designed for enterprise databases."
+            ]
+        },
+        {
+            "tag": "networking_questions",
+            "patterns": [
+                "What is cloud networking",
+                "What is a VPC",
+                "What is a subnet",
+                "What is a load balancer",
+                "What is DNS",
+                "What is VPN"
+            ],
+            "responses": [
+                "Cloud networking utilizes Virtual Private Clouds (VPCs), secure subnets, VPN gateways, and load balancers to safely route global traffic."
+            ]
+        },
+        {
+            "tag": "learned_1780503572",
+            "patterns": [
+                "thank you"
+            ],
+            "responses": [
+                "Who is the founder of CloudX?"
+            ]
+        },
+        {
+            "tag": "learned_1780503608",
+            "patterns": [
+                "wht"
+            ],
+            "responses": [
+                "i am sethumi"
+            ]
+        }
+    ]
+}

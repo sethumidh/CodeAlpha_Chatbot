@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Cloud Computing Assistant Dashboard</title>
+    <style>
+        /* CSS Variables for Dynamic Theme Changing */
+        :root {
+            --bg-main: #131129;
+            --sidebar-bg: #1c1a39;
+            --card-bg: #25224d;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --accent-color: #3b82f6; /* Default Accent */
+            --input-bg: #1c1a39;
+            --border-color: #2e2a5e;
+            --chat-bg: transparent;
+        }
+
+        /* Light Mode Styles override */
+        [data-theme="light"] {
+            --bg-main: #f3f4f6;
+            --sidebar-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --input-bg: #f9fafb;
+            --border-color: #e5e7eb;
+            --chat-bg: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Left Sidebar Layout */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .logo-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #22c55e;
+            border-radius: 50%;
+        }
+
+        .menu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 40px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item.active, .menu-item:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--text-main);
+        }
+        
+        .menu-item.active {
+            background-color: var(--accent-color) !important;
+            color: #ffffff !important;
+        }
+
+        /* Sidebar Bottom Actions Panel */
+        .sidebar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-sidebar-action {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-sidebar-action:hover {
+            background-color: var(--border-color);
+        }
+
+        /* Right Large Panel */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .header-title h1 {
+            margin: 0 0 10px 0;
+            font-size: 38px;
+            font-weight: 700;
+        }
+        .header-title p {
+            margin: 0 0 25px 0;
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        /* Clean Session Header Frame */
+        .chat-section-wrapper {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--chat-bg);
+            margin-bottom: 20px;
+        }
+
+        .chat-header {
+            padding: 10px 0 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* Chat Messages Container */
+        #chat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .msg-row {
+            display: flex;
+            flex-direction: column;
+            max-width: 85%;
+        }
+        .msg-row.bot { align-self: flex-start; }
+        .msg-row.user { align-self: flex-end; }
+
+        .msg-bubble {
+            padding: 16px 22px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.6;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .msg-row.bot .msg-bubble {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-top-left-radius: 4px;
+        }
+        .msg-row.user .msg-bubble {
+            background-color: var(--accent-color);
+            color: white;
+            border-top-right-radius: 4px;
+        }
+
+        .bot-utility-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            padding: 0 4px;
+        }
+        .util-group { display: flex; gap: 15px; }
+        
+        /* Action buttons styling */
+        .util-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 13px;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.1s ease;
+        }
+        .util-btn:hover { 
+            color: var(--text-main); 
+            transform: scale(1.05);
+        }
+        .util-btn:active {
+            transform: scale(0.95);
+        }
+
+        .timestamp {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .msg-row.user .timestamp { text-align: right; }
+
+        /* Footer Controls Area */
+        .footer-controls-panel {
+            margin-top: auto;
+            padding-top: 15px;
+        }
+
+        .suggestion-row {
+            display: flex;
+            gap: 10px;
+            padding: 0 5px 12px 5px;
+            overflow-x: auto;
+        }
+        .suggestion-row::-webkit-scrollbar { height: 0px; }
+
+        .chip {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .chip:hover { 
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .emoji-row {
+            display: flex;
+            gap: 12px;
+            padding: 0 5px 12px 5px;
+        }
+        .emoji-btn {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .emoji-btn:hover { transform: scale(1.2); }
+
+        .input-wrapper-container {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background-color 0.3s;
+        }
+
+        .input-mic {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        #user-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-size: 15px;
+        }
+        #user-input::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+        .input-send-btn {
+            background: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            padding: 8px 22px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .input-send-btn:hover { filter: brightness(1.1); }
+
+        /* Settings Dialog Overlay Design */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 450px;
+            padding: 30px;
+            color: var(--text-main);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 { margin: 0; font-size: 22px; }
+        .close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .setting-section { margin-bottom: 25px; }
+        .setting-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .theme-toggle-row { display: flex; gap: 15px; }
+        .theme-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-main);
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .theme-btn.active { 
+            border-color: var(--accent-color); 
+            background: rgba(59, 130, 246, 0.1); 
+        }
+        .color-palette { display: flex; gap: 15px; }
+        .color-dot {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.1s;
+        }
+        .color-dot:hover { transform: scale(1.1); }
+        .color-dot.active { border-color: var(--text-main); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <div class="logo-section">
+                <div class="logo-dot"></div>
+                <span>AI Cloud Assistant</span>
+            </div>
+            <div class="menu-links">
+                <div class="menu-item active" id="live-terminal-item">💬 Live Terminal</div>
+                <div class="menu-item" onclick="openSettingsModal()">⚙️ Settings</div>
+            </div>
+        </div>
+
+        <div class="sidebar-actions">
+            <button class="btn-sidebar-action" onclick="exportChatHistory()">💾 Export Chat</button>
+            <button class="btn-sidebar-action" onclick="clearChat()">🗑️ Clear Chat</button>
+        </div>
+    </div>
+
+    <div class="main-container" id="main-viewport">
+        <div class="header-title">
+            <h1>Cloud Computing Assistant</h1>
+            <p>Select an architecture subdomain to start configuring solutions.</p>
+        </div>
+
+        <div class="chat-section-wrapper">
+            <div class="chat-header">
+                <div>
+                    <span style="font-weight: 600; font-size: 16px;">Active Conversation Session</span>
+                </div>
+            </div>
+
+            <div id="chat-box">
+                <div class="msg-row bot">
+                    <div class="msg-bubble" id="welcome-msg-init">Hi there! 👋 I'm your Cloud Computing Assistant. How can I help you today? I can help you with the following areas:</div>
+                    
+                    <div class="bot-utility-row" style="display: flex; gap: 15px; margin-top: 5px; padding-left: 5px;">
+                        <button class="util-btn" onclick="handleFeedback('welcome-msg-init', 'good')">👍 Helpful</button>
+                        <button class="util-btn" onclick="handleFeedback('welcome-msg-init', 'bad')">👎 Not Helpful</button>
+                        <button class="util-btn" id="copy-btn-welcome-msg-init" onclick="copyToClipboard('welcome-msg-init')">📄 Copy</button>
+                        <button class="util-btn" id="speak-btn-welcome-msg-init" onclick="readAloud('welcome-msg-init')">🔈 Speak</button>
+                    </div>
+
+                    <div class="timestamp" id="initial-time">9:53 AM</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-controls-panel">
+            <div class="suggestion-row">
+                <button class="chip" onclick="selectCloudTopic('☁️ Cloud Services')">☁️ Cloud Services</button>
+                <button class="chip" onclick="selectCloudTopic('☁️ AWS')">☁️ AWS</button>
+                <button class="chip" onclick="selectCloudTopic('☁️ Microsoft Azure')">☁️ Microsoft Azure</button>
+                <button class="chip" onclick="selectCloudTopic('☁️ Google Cloud')">☁️ Google Cloud</button>
+                <button class="chip" onclick="selectCloudTopic('🔒 Cloud Security')">🔒 Cloud Security</button>
+                <button class="chip" onclick="selectCloudTopic('🚀 Deployment')">🚀 Deployment</button>
+                <button class="chip" onclick="selectCloudTopic('💾 Storage')">💾 Storage</button>
+                <button class="chip" onclick="selectCloudTopic('🌐 Networking')">🌐 Networking</button>
+            </div>
+
+            <div class="emoji-row">
+                <button class="emoji-btn" onclick="insertEmoji('☁️')">☁️</button>
+                <button class="emoji-btn" onclick="insertEmoji('🔒')">🔒</button>
+                <button class="emoji-btn" onclick="insertEmoji('🚀')">🚀</button>
+                <button class="emoji-btn" onclick="insertEmoji('💾')">💾</button>
+                <button class="emoji-btn" onclick="insertEmoji('🌐')">🌐</button>
+            </div>
+
+            <div class="input-wrapper-container">
+                <button class="input-mic" id="voice-trigger-btn" onclick="handleVoiceInput()">🎤</button>
+                <input type="text" id="user-input" placeholder="Ask your cloud infrastructure question..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button class="input-send-btn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Customize your bot</h3>
+                <button class="close-modal" onclick="closeSettingsModal()">✕</button>
+            </div>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: -10px; margin-bottom: 20px;">
+                Change the visual aesthetics to dynamically align your platform interface.
+            </p>
+            
+            <div class="setting-section">
+                <label>Theme Layout</label>
+                <div class="theme-toggle-row">
+                    <button class="theme-btn active" id="theme-light-btn" onclick="setThemeLayout('light')">☀️ Light</button>
+                    <button class="theme-btn" id="theme-dark-btn" onclick="setThemeLayout('dark')">🌙 Dark</button>
+                </div>
+            </div>
+
+            <div class="setting-section">
+                <label>Accent Custom Color</label>
+                <div class="color-palette">
+                    <div class="color-dot active" style="background-color: #3b82f6;" onclick="changeAccent('#3b82f6', this)"></div>
+                    <div class="color-dot" style="background-color: #8b5cf6;" onclick="changeAccent('#8b5cf6', this)"></div>
+                    <div class="color-dot" style="background-color: #ea580c;" onclick="changeAccent('#ea580c', this)"></div>
+                    <div class="color-dot" style="background-color: #16a34a;" onclick="changeAccent('#16a34a', this)"></div>
+                    <div class="color-dot" style="background-color: #db2777;" onclick="changeAccent('#db2777', this)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.getElementById('initial-time').innerText = getCurrentTime();
+    
+    let currentContext = "General"; 
+    let currentUtterance = null;
+    let currentlySpeakingId = null;
+
+    // Comprehensive Q&A Local Knowledge Base Setup
+    const cloudKnowledgeBase = {
+        "☁️ Cloud Services": {
+            "what is cloud computing": "Cloud computing is the delivery of computing resources such as servers, storage, databases, and software over the internet.",
+            "what are the benefits of cloud computing": "Cloud computing offers scalability, cost savings, flexibility, reliability, and remote accessibility.",
+            "what are the types of cloud computing": "The main types are Public Cloud, Private Cloud, and Hybrid Cloud.",
+            "what is saas": "Software as a Service (SaaS) delivers software applications over the internet without requiring local installation.",
+            "what is paas": "Platform as a Service (PaaS) provides a platform for developing, testing, and deploying applications.",
+            "what is iaas": "Infrastructure as a Service (IaaS) provides virtualized computing resources such as servers and storage."
+        },
+        "☁️ AWS": {
+            "what is aws": "AWS (Amazon Web Services) is a cloud platform that provides computing, storage, networking, and security services.",
+            "what is amazon ec2": "Amazon EC2 is a virtual server service that allows users to run applications in the cloud.",
+            "what is amazon s3": "Amazon S3 is a cloud storage service used to store and retrieve data securely.",
+            "what is aws lambda": "AWS Lambda is a serverless computing service that runs code without managing servers.",
+            "what is amazon rds": "Amazon RDS is a managed database service that supports multiple database engines.",
+            "what is aws cloudwatch": "CloudWatch is a monitoring service for AWS resources and applications."
+        },
+        "☁️ Microsoft Azure": {
+            "what is microsoft azure": "Microsoft Azure is a cloud platform that provides infrastructure, software, and platform services.",
+            "what is azure virtual machine": "Azure Virtual Machine is a cloud-based virtual server service.",
+            "what is azure storage": "Azure Storage provides secure and scalable cloud storage solutions.",
+            "what is azure app service": "Azure App Service is a platform for building and hosting web applications.",
+            "what is azure active directory": "Azure Active Directory is a cloud-based identity and access management service."
+        },
+        "☁️ Google Cloud": {
+            "what is google cloud platform": "Google Cloud Platform (GCP) provides cloud services including computing, storage, networking, and AI solutions.",
+            "what is google compute engine": "Google Compute Engine provides virtual machines that run in Google data centers.",
+            "what is google cloud storage": "Google Cloud Storage is a scalable cloud storage solution for data and applications.",
+            "what is google kubernetes engine": "Google Kubernetes Engine (GKE) is a managed Kubernetes service for deploying containerized applications.",
+            "what is bigquery": "BigQuery is Google's serverless data warehouse for analytics and reporting."
+        },
+        "🔒 Cloud Security": {
+            "what is cloud security": "Cloud security refers to policies, technologies, and controls used to protect cloud systems and data.",
+            "why is cloud security important": "Cloud security protects sensitive information from cyber threats and unauthorized access.",
+            "what is multi-factor authentication": "Multi-Factor Authentication (MFA) requires users to verify their identity using multiple authentication methods.",
+            "what is mfa": "Multi-Factor Authentication (MFA) requires users to verify their identity using multiple authentication methods.",
+            "what is encryption": "Encryption converts data into a secure format that can only be read with the correct key.",
+            "what is a firewall": "A firewall monitors and controls incoming and outgoing network traffic.",
+            "what is iam": "Identity and Access Management (IAM) controls user permissions and access to cloud resources."
+        },
+        "🚀 Deployment": {
+            "what is deployment": "Deployment is the process of making an application available for users.",
+            "what is cloud deployment": "Cloud deployment involves hosting applications on cloud infrastructure.",
+            "what is ci/cd": "CI/CD stands for Continuous Integration and Continuous Deployment, which automate software delivery.",
+            "what is docker": "Docker is a platform used to package applications into containers.",
+            "what is kubernetes": "Kubernetes is a container orchestration platform used to manage containerized applications.",
+            "how can i deploy a flask application": "Flask applications can be deployed on Render, Railway, AWS, Azure, or Google Cloud."
+        },
+        "💾 Storage": {
+            "what is cloud storage": "Cloud storage allows users to store and access data through the internet.",
+            "what are the advantages of cloud storage": "Cloud storage offers scalability, accessibility, backup, and cost efficiency.",
+            "what is object storage": "Object storage stores data as objects and is commonly used in cloud environments.",
+            "what is block storage": "Block storage divides data into blocks and is commonly used for databases and virtual machines.",
+            "what is backup storage": "Backup storage is used to store copies of data for recovery purposes."
+        },
+        "🌐 Networking": {
+            "what is cloud networking": "Cloud networking connects cloud resources and services through virtual networks.",
+            "what is a vpc": "A Virtual Private Cloud (VPC) is an isolated virtual network within a cloud platform.",
+            "what is a subnet": "A subnet is a segmented portion of a network used for organization and security.",
+            "what is a load balancer": "A load balancer distributes incoming traffic across multiple servers.",
+            "what is dns": "DNS translates domain names into IP addresses.",
+            "what is vpn": "Virtual Private Network (VPN) provides secure communication over public networks."
+        }
+    };
+
+    function getCurrentTime() {
+        const now = new Date();
+        let hours = now.getHours();
+        let minutes = now.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        minutes = minutes < 10 ? '0'+minutes : minutes;
+        return hours + ':' + minutes + ' ' + ampm;
+    }
+
+    function openSettingsModal() { document.getElementById("settings-modal").style.display = "flex"; }
+    function closeSettingsModal() { document.getElementById("settings-modal").style.display = "none"; }
+    
+    function setThemeLayout(mode) {
+        document.getElementById('theme-light-btn').classList.remove('active');
+        document.getElementById('theme-dark-btn').classList.remove('active');
+        
+        if (mode === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.getElementById('theme-light-btn').classList.add('active');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            document.getElementById('theme-dark-btn').classList.add('active');
+        }
+    }
+
+    function changeAccent(color, element) {
+        document.documentElement.style.setProperty('--accent-color', color);
+        const dots = document.querySelectorAll('.color-dot');
+        dots.forEach(d => d.classList.remove('active'));
+        element.classList.add('active');
+        
+        const activeMenu = document.getElementById('live-terminal-item');
+        if(activeMenu.classList.contains('active')) {
+            activeMenu.style.backgroundColor = color;
+        }
+    }
+
+    // Dynamic text clipboard integration module
+    function copyToClipboard(elementId) {
+        const textToCopy = document.getElementById(elementId).innerText;
+        const copyBtn = document.getElementById(`copy-btn-${elementId}`);
+        
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            copyBtn.innerText = "Copied! ";
+            copyBtn.style.color = "#22c55e"; // Changes color temporarily to green
+            
+            setTimeout(() => {
+                copyBtn.innerText = "📄 Copy";
+                copyBtn.style.color = "var(--text-muted)";
+            }, 2000);
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+        });
+    }
+
+    function selectCloudTopic(topicName) {
+        const chatBox = document.getElementById("chat-box");
+        currentContext = topicName; 
+        
+        chatBox.innerHTML += `
+            <div class="msg-row user">
+                <div class="msg-bubble">Selected Category: ${topicName}</div>
+                <div class="timestamp">${getCurrentTime()}</div>
+            </div>`;
+            
+        setTimeout(() => {
+            const msgId = 'bot-msg-' + Date.now();
+            chatBox.innerHTML += `
+                <div class="msg-row bot">
+                    <div class="msg-bubble" id="${msgId}">Great choice! I will help you with ${topicName} architectures and related questions. What specific problem are you facing?</div>
+                    
+                    <div class="bot-utility-row" style="display: flex; gap: 15px; margin-top: 5px; padding-left: 5px;">
+                        <button class="util-btn" onclick="handleFeedback('${msgId}', 'good')">👍 Helpful</button>
+                        <button class="util-btn" onclick="handleFeedback('${msgId}', 'bad')">👎 Not Helpful</button>
+                        <button class="util-btn" id="copy-btn-${msgId}" onclick="copyToClipboard('${msgId}')">📄 Copy</button>
+                        <button class="util-btn" id="speak-btn-${msgId}" onclick="readAloud('${msgId}')">🔈 Speak</button>
+                    </div>
+
+                    <div class="timestamp">${getCurrentTime()}</div>
+                </div>`;
+            scrollViewportToBottom();
+        }, 400);
+
+        scrollViewportToBottom();
+    }
+
+    function insertEmoji(emoji) {
+        const input = document.getElementById("user-input");
+        input.value += emoji;
+        input.focus();
+    }
+
+    function scrollViewportToBottom() {
+        const viewport = document.getElementById("main-viewport");
+        viewport.scrollTop = viewport.scrollHeight;
+    }
+
+    function clearChat() {
+        if (confirm("Are you sure you want to clear the conversation?")) {
+            currentContext = "General";
+            const msgId = 'bot-msg-' + Date.now();
+            document.getElementById("chat-box").innerHTML = `
+                <div class="msg-row bot">
+                    <div class="msg-bubble" id="${msgId}">Hi there! 👋 I'm your Cloud Computing Assistant. How can I help you today?</div>
+                    
+                    <div class="bot-utility-row" style="display: flex; gap: 15px; margin-top: 5px; padding-left: 5px;">
+                        <button class="util-btn" onclick="handleFeedback('${msgId}', 'good')">👍 Helpful</button>
+                        <button class="util-btn" onclick="handleFeedback('${msgId}', 'bad')">👎 Not Helpful</button>
+                        <button class="util-btn" id="copy-btn-${msgId}" onclick="copyToClipboard('${msgId}')">📄 Copy</button>
+                        <button class="util-btn" id="speak-btn-${msgId}" onclick="readAloud('${msgId}')">🔈 Speak</button>
+                    </div>
+
+                    <div class="timestamp">${getCurrentTime()}</div>
+                </div>`;
+            scrollViewportToBottom();
+        }
+    }
+
+    function exportChatHistory() {
+        const chatBox = document.getElementById("chat-box");
+        let rawLogText = "";
+        const messages = chatBox.querySelectorAll('.msg-row');
+        messages.forEach(msgWrap => {
+            const isUser = msgWrap.classList.contains('user');
+            const speaker = isUser ? "User" : "Bot";
+            const textContent = msgWrap.querySelector('.msg-bubble').innerText;
+            const timeStr = msgWrap.querySelector('.timestamp')?.innerText || "";
+            rawLogText += `[${timeStr}] ${speaker}: ${textContent}\n`;
+        });
+        if(!rawLogText.trim()) return;
+        const dataBlob = new Blob([rawLogText], { type: "text/plain;charset=utf-8" });
+        const temporaryAnchor = document.createElement("a");
+        temporaryAnchor.href = URL.createObjectURL(dataBlob);
+        temporaryAnchor.download = `Cloud_Chat_History.txt`;
+        temporaryAnchor.click();
+    }
+
+    function handleVoiceInput() {
+        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!window.SpeechRecognition) {
+            alert("Speech recognition API not supported.");
+            return;
+        }
+        const voiceBtn = document.getElementById("voice-trigger-btn");
+        const trackingRecognition = new SpeechRecognition();
+        voiceBtn.innerText = "🛑";
+        trackingRecognition.start();
+        trackingRecognition.onresult = function(e) {
+            document.getElementById("user-input").value = e.results[0][0].transcript;
+            voiceBtn.innerText = "🎤";
+        };
+        trackingRecognition.onerror = () => voiceBtn.innerText = "🎤";
+        trackingRecognition.onend = () => voiceBtn.innerText = "🎤";
+    }
+
+    function readAloud(elementId) {
+        const messageText = document.getElementById(elementId).innerText;
+        const speakBtn = document.getElementById(`speak-btn-${elementId}`);
+
+        if (window.speechSynthesis.speaking && currentlySpeakingId === elementId) {
+            window.speechSynthesis.cancel();
+            speakBtn.innerText = "🔈 Speak";
+            currentlySpeakingId = null;
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+        document.querySelectorAll('[id^="speak-btn-"]').forEach(btn => btn.innerText = "🔈 Speak");
+
+        currentUtterance = new SpeechSynthesisUtterance(messageText);
+        currentlySpeakingId = elementId;
+
+        const voices = window.speechSynthesis.getVoices();
+        const englishVoice = voices.find(voice => voice.lang.startsWith('en')) || voices[0];
+        if (englishVoice) currentUtterance.voice = englishVoice;
+
+        currentUtterance.onstart = () => {
+            speakBtn.innerText = "🔇 Mute";
+        };
+
+        currentUtterance.onend = () => {
+            speakBtn.innerText = "🔈 Speak";
+            if (currentlySpeakingId === elementId) currentlySpeakingId = null;
+        };
+
+        currentUtterance.onerror = () => {
+            speakBtn.innerText = "🔈 Speak";
+            currentlySpeakingId = null;
+        };
+
+        window.speechSynthesis.speak(currentUtterance);
+    }
+
+    function handleFeedback(elementId, type) {
+        const element = document.getElementById(elementId);
+        const utilityRow = element.nextElementSibling;
+        const thumbsUpBtn = utilityRow.children[0];
+        const thumbsDownBtn = utilityRow.children[1];
+
+        if (type === 'good') {
+            thumbsUpBtn.style.color = '#22c55e';
+            thumbsDownBtn.style.color = 'var(--text-muted)';
+            console.log(`Message ${elementId} marked as HELPFUL`);
+        } else if (type === 'bad') {
+            thumbsUpBtn.style.color = 'var(--text-muted)';
+            thumbsDownBtn.style.color = '#ef4444';
+            console.log(`Message ${elementId} marked as NOT HELPFUL`);
+        }
+    }
+
+    // Main controller with integrated localized fallback mechanisms
+    async function sendMessage() {
+        const inputField = document.getElementById("user-input");
+        const chatBox = document.getElementById("chat-box");
+        const userText = inputField.value.trim();
+        if(!userText) return;
+
+        chatBox.innerHTML += `
+            <div class="msg-row user">
+                <div class="msg-bubble">${userText}</div>
+                <div class="timestamp">${getCurrentTime()}</div>
+            </div>`;
+            
+        inputField.value = "";
+        scrollViewportToBottom();
+
+        const cleanInput = userText.toLowerCase().replace(/[?.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").trim();
+
+        // Standard dynamic Greeting logic setup
+        if(cleanInput === 'hello' || cleanInput === 'hi' || cleanInput === 'hey' || cleanInput === 'hy') {
+            setTimeout(() => {
+                const msgId = 'bot-msg-' + Date.now();
+                chatBox.innerHTML += `
+                    <div class="msg-row bot">
+                        <div class="msg-bubble" id="${msgId}">Hi there! 👋 I'm your Cloud Computing Assistant. How can I help you today?</div>
+                        
+                        <div class="bot-utility-row" style="display: flex; gap: 15px; margin-top: 5px; padding-left: 5px;">
+                            <button class="util-btn" onclick="handleFeedback('${msgId}', 'good')">👍 Helpful</button>
+                            <button class="util-btn" onclick="handleFeedback('${msgId}', 'bad')">👎 Not Helpful</button>
+                            <button class="util-btn" id="copy-btn-${msgId}" onclick="copyToClipboard('${msgId}')">📄 Copy</button>
+                            <button class="util-btn" id="speak-btn-${msgId}" onclick="readAloud('${msgId}')">🔈 Speak</button>
+                        </div>
+
+                        <div class="timestamp">${getCurrentTime()}</div>
+                    </div>`;
+                scrollViewportToBottom();
+            }, 300);
+            return;
+        }
+
+        // Standard dynamic Goodbye logic setup
+        if(cleanInput === 'bye' || cleanInput === 'goodbye' || cleanInput === 'exit' || cleanInput === 'quit') {
+            setTimeout(() => {
+                const msgId = 'bot-msg-' + Date.now();
+                chatBox.innerHTML += `
+                    <div class="msg-row bot">
+                        <div class="msg-bubble" id="${msgId}">Thank you for engineering with me today. Have a stable and scalable day ahead!</div>
+                        
+                        <div class="bot-utility-row" style="display: flex; gap: 15px; margin-top: 5px; padding-left: 5px;">
+                            <button class="util-btn" onclick="handleFeedback('${msgId}', 'good')">👍 Helpful</button>
+                            <button class="util-btn" onclick="handleFeedback('${msgId}', 'bad')">👎 Not Helpful</button>
+                            <button class="util-btn" id="copy-btn-${msgId}" onclick="copyToClipboard('${msgId}')">📄 Copy</button>
+                            <button class="util-btn" id="speak-btn-${msgId}" onclick="readAloud('${msgId}')">🔈 Speak</button>
+                        </div>
+
+                        <div class="timestamp">${getCurrentTime()}</div>
+                    </div>`;
+                scrollViewportToBottom();
+            }, 300);
+            return;
+        }
+
+        // Search in local Knowledge Base dictionary using current category context
+        let localizedAnswer = null;
+        if (cloudKnowledgeBase[currentContext] && cloudKnowledgeBase[currentContext][cleanInput]) {
+            localizedAnswer = cloudKnowledgeBase[currentContext][cleanInput];
+        } else {
+            // Global search throughout the entire database if category doesn't match directly
+            for (const category in cloudKnowledgeBase) {
+                if (cloudKnowledgeBase[category][cleanInput]) {
+                    localizedAnswer = cloudKnowledgeBase[category][cleanInput];
+                    break;
+                }
+            }
+        }
+
+        // If matching question found locally, respond instantly
+        if (localizedAnswer) {
+            setTimeout(() => {
+                const msgId = 'bot-msg-' + Date.now();
+                chatBox.innerHTML += `
+                    <div class="msg-row bot">
+                        <div class="msg-bubble" id="${msgId}">${localizedAnswer}</div>
+                        
+                        <div class="bot-utility-row" style="display: flex; gap: 15px; margin-top: 5px; padding-left: 5px;">
+                            <button class="util-btn" onclick="handleFeedback('${msgId}', 'good')">👍 Helpful</button>
+                            <button class="util-btn" onclick="handleFeedback('${msgId}', 'bad')">👎 Not Helpful</button>
+                            <button class="util-btn" id="copy-btn-${msgId}" onclick="copyToClipboard('${msgId}')">📄 Copy</button>
+                            <button class="util-btn" id="speak-btn-${msgId}" onclick="readAloud('${msgId}')">🔈 Speak</button>
+                        </div>
+
+                        <div class="timestamp">${getCurrentTime()}</div>
+                    </div>`;
+                scrollViewportToBottom();
+            }, 300);
+            return;
+        }
+
+        // Fallback to Backend live API server if question is not in local dictionary
+        try {
+            const response = await fetch('http://localhost:5000/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userText, context: currentContext })
+            });
+            const data = await response.json();
+
+            const msgId = 'bot-msg-' + Date.now();
+            chatBox.innerHTML += `
+                <div class="msg-row bot">
+                    <div class="msg-bubble" id="${msgId}">${data.response}</div>
+                    
+                    <div class="bot-utility-row" style="display: flex; gap: 15px; margin-top: 5px; padding-left: 5px;">
+                        <button class="util-btn" onclick="handleFeedback('${msgId}', 'good')">👍 Helpful</button>
+                        <button class="util-btn" onclick="handleFeedback('${msgId}', 'bad')">👎 Not Helpful</button>
+                        <button class="util-btn" id="copy-btn-${msgId}" onclick="copyToClipboard('${msgId}')">📄 Copy</button>
+                        <button class="util-btn" id="speak-btn-${msgId}" onclick="readAloud('${msgId}')">🔈 Speak</button>
+                    </div>
+
+                    <div class="timestamp">${getCurrentTime()}</div>
+                </div>`;
+            scrollViewportToBottom();
+        } catch (error) {
+            chatBox.innerHTML += `
+                <div class="msg-row bot">
+                    <div class="msg-bubble" style="color: #ef4444;">Server connection failed. Could not pull cloud intelligence.</div>
+                </div>`;
+            scrollViewportToBottom();
+        }
+    }
+    </script>
+</body>
+</html>
